@@ -7,14 +7,14 @@
 
 
 //define global constant
-const double inf = 10e8f;
-const double timeLimit = 1.00f;
+const double Inf = 10e8f;
+const double TimeLimit = 1.00f;
 
 //define board constant
-const int boardSizeX = 8;
-const int boardSizeY = 8;
-enum class COLOR { White = -1, Black = 1, Free = 0 };
-
+const int BoardSizeX = 8;
+const int BoardSizeY = 8;
+enum class COLOR { White = -1, Black = 1, Null = 0 };
+using BoardType = std::vector<std::vector<COLOR>> ;
 
 
 #endif //OTHELLO_TORCH_SETTINGS_H

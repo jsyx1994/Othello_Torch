@@ -44,17 +44,17 @@ void TreeNode::setReturns(double returns) {
 	TreeNode::returns = returns;
 }
 
-const boardType &TreeNode::getBoard() const {
+const BoardType &TreeNode::getBoard() const {
 	return board;
 }
 
-void TreeNode::setBoard(const boardType &board) {
+void TreeNode::setBoard(const BoardType &board) {
 	TreeNode::board = board;
 }
 
 TreeNode::TreeNode():
-		sideColor(COLOR::Free),
-		board(boardSizeX,std::vector<COLOR> (boardSizeY,COLOR::Free)),
+		sideColor(COLOR::Null),
+		board(BoardSizeX, std::vector<COLOR> (BoardSizeY, COLOR::Null)),
 		blackPieceCounts(0),
 		whitePieceCounts(0),
 		visits(0),

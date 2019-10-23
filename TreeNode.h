@@ -10,7 +10,7 @@
 #include "settings.h"
 
 
-using boardType = std::vector<std::vector<COLOR>> ;
+
 
 class TreeNode {
 public:
@@ -37,13 +37,13 @@ public:
 	
 	void setReturns(double returns);
 	
-	const boardType &getBoard() const;
+	const BoardType &getBoard() const;
 	
-	void setBoard(const boardType &board);
+	void setBoard(const BoardType &board);
 
 private:
 	COLOR sideColor;
-	boardType board;
+	BoardType board;
 	
 	int blackPieceCounts;
 	int whitePieceCounts;
