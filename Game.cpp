@@ -12,17 +12,18 @@ static int dx[] = {-1, 0, 1, 1, 1, 0, -1, -1};
 static int dy[] = {-1, -1, -1, 0, 1, 1, 1, 0};
 
 Game::Game() :
-		effectivePoints(std::max(BoardSizeX, BoardSizeY), std::vector<int>(2)),
-		gridInfo(BoardSizeX, std::vector<COLOR>(BoardSizeY)) {}
+		effectivePoints(std::max(BoardSizeX, BoardSizeY), std::vector<int>(2)){}
 
 /**
  * BotZone style of init
  * example input 1:   {"requests":[{"x":-1,"y":-1}],"responses":[]}
  * example input 2:   {"requests":[{"x":-1,"y":-1},{"x":2,"y":2},{"x":1,"y":3},{"x":3,"y":1},{"x":0,"y":2}],"responses":[{"x":2,"y":3},{"x":2,"y":1},{"x":1,"y":2},{"x":1,"y":4}]}
  **/
-void Game::LoadFromJson() {
+
+void Game::LoadFromJson(BoardType &gridInfo, int &whitePieceCounts, int &blackPieceCounts) {
 	int x, y;
-	
+	whitePieceCounts = 2;
+	blackPieceCounts = 2;
 	// 初始化棋盘
 	gridInfo[3][4] = gridInfo[4][3] = COLOR::Black; //|白|黑|
 	gridInfo[3][3] = gridInfo[4][4] = COLOR::White; //|黑|白|
@@ -44,18 +45,18 @@ void Game::LoadFromJson() {
 		x = input["requests"][i]["x"].asInt();
 		y = input["requests"][i]["y"].asInt();
 		if (x >= 0)
-			ProcStep(gridInfo, x, y, opponentColor); // 模拟对方落子
+			ProcStep(gridInfo, blackPieceCounts, whitePieceCounts, x, y, opponentColor); // 模拟对方落子
 		x = input["responses"][i]["x"].asInt();
 		y = input["responses"][i]["y"].asInt();
 		if (x >= 0)
-			ProcStep(gridInfo, x, y, currBotColor); // 模拟己方落子
+			ProcStep(gridInfo,blackPieceCounts, whitePieceCounts, x, y, currBotColor); // 模拟己方落子
 	}
 	
 	// 看看自己本回合输入
 	x = input["requests"][turnID]["x"].asInt();
 	y = input["requests"][turnID]["y"].asInt();
 	if (x >= 0)
-		ProcStep(gridInfo, x, y, opponentColor); // 模拟对方落子
+		ProcStep(gridInfo,blackPieceCounts, whitePieceCounts, x, y, opponentColor); // 模拟对方落子
 }
 
 bool Game::MoveStep(int &x, int &y, int Direction) {
@@ -65,7 +66,7 @@ bool Game::MoveStep(int &x, int &y, int Direction) {
 	return true;
 }
 
-bool Game::ProcStep(BoardType &gridInfo, int xPos, int yPos, COLOR color, bool checkOnly) {
+bool Game::ProcStep(BoardType &gridInfo, int &blackPieceCounts, int &whitePieceCounts, int xPos, int yPos, COLOR color, bool checkOnly) {
 	int dir, x, y, currCount;
 	bool isValidMove = false;
 	if (gridInfo[xPos][yPos] != COLOR::Null)
@@ -121,11 +122,11 @@ bool Game::ProcStep(BoardType &gridInfo, int xPos, int yPos, COLOR color, bool c
 		return false;
 }
 
-bool Game::CheckIfHasValidMove(BoardType &gridInfo, const COLOR &color) {
+bool Game::CheckIfHasValidMove(BoardType &gridInfo,int &blackPieceCounts, int &whitePieceCounts, const COLOR &color) {
 	int x, y;
 	for (y = 0; y < 8; y++)
 		for (x = 0; x < 8; x++)
-			if (ProcStep(gridInfo, x, y, color, true))
+			if (ProcStep(gridInfo,blackPieceCounts, whitePieceCounts, x, y, color, true))
 				return true;
 	return false;
 }
@@ -143,7 +144,7 @@ COLOR Game::Opponent(const COLOR &myColor) {
 	return myColor == COLOR::Black ? COLOR::White : COLOR::Black;
 }
 
-void Game::PrintBoard() {
+void Game::PrintBoard(const BoardType &gridInfo) const{
 	std::cout << "Y X";
 	for (int i = 0; i < 8; ++i) {
 		std::cout << i << "  ";
@@ -164,12 +165,12 @@ void Game::PrintBoard() {
 	std::cout << std::endl;
 }
 
-std::pair<int ,int> Game::RandomPolicy() {
+std::pair<int, int> Game::RandomPolicy(BoardType &gridInfo, int &blackPieceCounts, int &whitePieceCounts) {
 	int possiblePos[64][2], posCount = 0, choice;
 	int x, y;
 	for (y = 0; y < 8; y++)
 		for (x = 0; x < 8; x++)
-			if (ProcStep(gridInfo, x, y, currBotColor, true)) {
+			if (ProcStep(gridInfo,blackPieceCounts,whitePieceCounts, x, y, currBotColor, true)) {
 				possiblePos[posCount][0] = x;
 				possiblePos[posCount++][1] = y;
 			}
@@ -195,12 +196,21 @@ void Game::OutputToJson(int resultX, int resultY) {
 	std::cout << writer.write(ret) << std::endl;
 }
 
-BoardType &Game::getGridInfo() {
-	return gridInfo;
-}
-
 COLOR Game::getCurrBotColor() const {
 	return currBotColor;
+}
+
+bool Game::isGameEnded(BoardType &gridInfo, int whitePieces, int blackPieces) {
+	return (whitePieces + blackPieces >= BoardSizeX * BoardSizeY) ||
+	       ((!CheckIfHasValidMove(gridInfo,blackPieces, whitePieces, COLOR::White)) && (!CheckIfHasValidMove(gridInfo,blackPieces, whitePieces, COLOR::Black)));
+}
+
+COLOR Game::judgeWinner(const int whitePieces, const int blackPieces) const {
+	return whitePieces == blackPieces ? COLOR::Null : whitePieces > blackPieces ? COLOR::White : COLOR::Black;
+}
+
+void Game::setCurrBotColor(COLOR currBotColor) {
+	Game::currBotColor = currBotColor;
 }
 
 

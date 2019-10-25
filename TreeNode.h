@@ -13,6 +13,7 @@ class TreeNode {
 public:
 	
 	TreeNode();
+	TreeNode(BoardType gridInfo);
 	
 	COLOR getSideColor() const;
 	

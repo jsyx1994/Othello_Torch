@@ -9,18 +9,25 @@
 #include "TreeNode.h"
 
 const double C = .5f;
-
+const double Inf = 10e8f;
+const double TimeLimit = 1.00f;
+/* **
+ * Given the position and color, build root state and search from it
+ * **/
 class MCTS {
 public:
-	MCTS();
+	MCTS() = default;
+	MCTS(BoardType gridInfo, COLOR color, int blackPieceCounts, int whitePieceCounts);
 	~MCTS();
 	void TreePolicy();
 	void Expandition();
 	void DefaultPolicy();
 	void BackPropagation();
+	void exec();
 private:
+	COLOR sideColor;
 	BoardType position;
-	TreeNode *rootPos;
+	TreeNode *rootPos = nullptr;
 };
 
 

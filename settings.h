@@ -6,10 +6,6 @@
 #define OTHELLO_TORCH_SETTINGS_H
 
 
-//define global constant
-const double Inf = 10e8f;
-const double TimeLimit = 1.00f;
-
 //define board constant
 const int BoardSizeX = 8;
 const int BoardSizeY = 8;

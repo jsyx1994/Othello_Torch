@@ -69,3 +69,6 @@ const CoordinateType &TreeNode::getLastPlayerAction() const {
 void TreeNode::setLastPlayerAction(const CoordinateType &lastPlayerAction) {
 	TreeNode::lastPlayerAction = lastPlayerAction;
 }
+
+TreeNode::TreeNode(BoardType gridInfo):board(gridInfo) {
+}
