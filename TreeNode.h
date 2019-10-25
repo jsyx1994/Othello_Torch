@@ -6,12 +6,9 @@
 #define OTHELLO_TORCH_TREENODE_H
 
 #include <vector>
+#include <algorithm>
 
 #include "settings.h"
-
-
-
-
 class TreeNode {
 public:
 	
@@ -29,6 +26,10 @@ public:
 	
 	void setWhitePieceCounts(int whitePieceCounts);
 	
+	const CoordinateType &getLastPlayerAction() const;
+	
+	void setLastPlayerAction(const CoordinateType &lastPlayerAction);
+	
 	long long int getVisits() const;
 	
 	void setVisits(long long int visits);
@@ -40,16 +41,22 @@ public:
 	const BoardType &getBoard() const;
 	
 	void setBoard(const BoardType &board);
+	//------------------------------------
+	
 
 private:
 	COLOR sideColor;
 	BoardType board;
+	CoordinateType lastPlayerAction;
+	std::vector<TreeNode*> childrenHeap;
 	
 	int blackPieceCounts;
 	int whitePieceCounts;
 	
 	long long visits;
 	double returns;
+	
+	double weights;
 };
 
 

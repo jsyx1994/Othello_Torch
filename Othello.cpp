@@ -7,7 +7,9 @@ int main() {
 	TreeNode x;
 	Game game;
 	game.LoadFromJson();
-	game.RandomPolicy();
+ 	auto pair = game.RandomPolicy();
+	game.PrintBoard();
+	game.ProcStep(game.getGridInfo(), pair.first, pair.second, game.getCurrBotColor());
 	game.PrintBoard();
 	int y = 1;
 	COLOR color = COLOR ::Black;

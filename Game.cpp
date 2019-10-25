@@ -144,7 +144,7 @@ COLOR Game::Opponent(const COLOR &myColor) {
 }
 
 void Game::PrintBoard() {
-	std::cout << "   ";
+	std::cout << "Y X";
 	for (int i = 0; i < 8; ++i) {
 		std::cout << i << "  ";
 	}
@@ -193,6 +193,14 @@ void Game::OutputToJson(int resultX, int resultY) {
 	ret["response"]["y"] = resultY;
 	Json::FastWriter writer;
 	std::cout << writer.write(ret) << std::endl;
+}
+
+BoardType &Game::getGridInfo() {
+	return gridInfo;
+}
+
+COLOR Game::getCurrBotColor() const {
+	return currBotColor;
 }
 
 

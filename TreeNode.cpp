@@ -54,8 +54,18 @@ void TreeNode::setBoard(const BoardType &board) {
 
 TreeNode::TreeNode():
 		sideColor(COLOR::Null),
-		board(BoardSizeX, std::vector<COLOR> (BoardSizeY, COLOR::Null)),
+		board(BoardSizeY, std::vector<COLOR> (BoardSizeX, COLOR::Null)),
+		childrenHeap({}),
 		blackPieceCounts(0),
 		whitePieceCounts(0),
 		visits(0),
-		returns(.0f) {}
+		returns(.0f),
+		weights(.0f){}
+
+const CoordinateType &TreeNode::getLastPlayerAction() const {
+	return lastPlayerAction;
+}
+
+void TreeNode::setLastPlayerAction(const CoordinateType &lastPlayerAction) {
+	TreeNode::lastPlayerAction = lastPlayerAction;
+}

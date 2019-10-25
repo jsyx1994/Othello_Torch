@@ -6,6 +6,7 @@
 #define OTHELLO_TORCH_GAME_H
 
 #include <string>
+#include <vector>
 #include "settings.h"
 
 class Game {
@@ -22,6 +23,9 @@ public:
 	void PrintBoard();
 	std::pair<int ,int> RandomPolicy();
 	void OutputToJson(int x, int y);
+	COLOR getCurrBotColor() const;
+	BoardType &getGridInfo();
+	
 private:
 	std::vector<std::vector<int>> effectivePoints;
 	COLOR currBotColor;
