@@ -35,27 +35,26 @@ public:
 	
 	void setVisits(long long int visits);
 	
-	double getReturns() const;
-	
-	void setReturns(double returns);
-	
 	const BoardType &getBoard() const;
 	
 	void setBoard(const BoardType &board);
-	//------------------------------------
 	
+	double getQ() const;
+	
+	void setQ(double q);
+
 
 private:
 	COLOR sideColor;
 	BoardType board;
 	CoordinateType lastPlayerAction;
-	std::vector<TreeNode*> childrenHeap;
+	std::vector<TreeNode*> children;
 	
 	int blackPieceCounts;
 	int whitePieceCounts;
 	
 	long long visits;
-	double returns;
+	double _Q;
 	
 	double weights;
 };

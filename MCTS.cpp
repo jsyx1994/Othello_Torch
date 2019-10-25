@@ -10,3 +10,7 @@ MCTS::MCTS(BoardType gridInfo, COLOR color, int blackPieceCounts, int whitePiece
 	rootPos->setBlackPieceCounts(blackPieceCounts);
 	rootPos->setWhitePieceCounts(whitePieceCounts);
 }
+
+double MCTS::CalcUCB1(TreeNode *node) {
+	return 0;
+}

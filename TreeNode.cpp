@@ -36,14 +36,6 @@ void TreeNode::setVisits(long long int visits) {
 	TreeNode::visits = visits;
 }
 
-double TreeNode::getReturns() const {
-	return returns;
-}
-
-void TreeNode::setReturns(double returns) {
-	TreeNode::returns = returns;
-}
-
 const BoardType &TreeNode::getBoard() const {
 	return board;
 }
@@ -55,11 +47,11 @@ void TreeNode::setBoard(const BoardType &board) {
 TreeNode::TreeNode():
 		sideColor(COLOR::Null),
 		board(BoardSizeY, std::vector<COLOR> (BoardSizeX, COLOR::Null)),
-		childrenHeap({}),
+		children({}),
 		blackPieceCounts(0),
 		whitePieceCounts(0),
 		visits(0),
-		returns(.0f),
+		_Q(.0f),
 		weights(.0f){}
 
 const CoordinateType &TreeNode::getLastPlayerAction() const {
@@ -71,4 +63,12 @@ void TreeNode::setLastPlayerAction(const CoordinateType &lastPlayerAction) {
 }
 
 TreeNode::TreeNode(BoardType gridInfo):board(gridInfo) {
+}
+
+double TreeNode::getQ() const {
+	return _Q;
+}
+
+void TreeNode::setQ(double q) {
+	_Q = q;
 }

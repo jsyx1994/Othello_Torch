@@ -38,9 +38,7 @@ public:
 	int getWhitePieceCounts() const;
 	
 	void setWhitePieceCounts(int whitePieceCounts);
-
-private:
-public:
+	
 	void setCurrBotColor(COLOR currBotColor);
 
 private:
