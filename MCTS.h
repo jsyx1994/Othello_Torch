@@ -10,6 +10,7 @@
 
 const double C = .5f;
 const double TimeLimit = 1.00f;
+const double Inf = 10e8f;
 /* **
  * Given the position and color, build root state and search from it
  * **/
@@ -19,11 +20,12 @@ public:
 	MCTS(BoardType gridInfo, COLOR color, int blackPieceCounts, int whitePieceCounts);
 	~MCTS();
 	TreeNode* TreePolicy();
-	void Expandition();
+	void Expandition(TreeNode *leaf);
 	void DefaultPolicy();
 	void BackPropagation();
 	void exec();
-	double CalcUCB1(TreeNode *node);
+	double CalcUCB1(TreeNode *node, long long n);
+	TreeNode *chooseBestChild(TreeNode *father);
 private:
 	COLOR sideColor;
 	BoardType position;

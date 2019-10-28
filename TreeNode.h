@@ -9,6 +9,8 @@
 #include <algorithm>
 
 #include "settings.h"
+
+
 class TreeNode {
 public:
 	
@@ -39,17 +41,27 @@ public:
 	
 	void setBoard(const BoardType &board);
 	
-	double getQ() const;
+	const double& getQ() const;
 	
 	void setQ(double q);
-
+	
+	bool HasChild(){
+		return !children.empty();
+	}
+	
+	const std::vector<TreeNode *> &getChildren() const;
+	
+	void setChildren(const std::vector<TreeNode *> &children);
+	
+	double getWeights() const;
+	
+	void setWeights(double weights);
 
 private:
 	COLOR sideColor;
 	BoardType board;
 	CoordinateType lastPlayerAction;
-	std::vector<TreeNode*> children;
-	
+	std::vector<TreeNode *> children;
 	int blackPieceCounts;
 	int whitePieceCounts;
 	

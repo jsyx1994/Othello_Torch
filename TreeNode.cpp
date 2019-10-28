@@ -52,7 +52,8 @@ TreeNode::TreeNode():
 		whitePieceCounts(0),
 		visits(0),
 		_Q(.0f),
-		weights(.0f){}
+		weights(.0f)
+		{}
 
 const CoordinateType &TreeNode::getLastPlayerAction() const {
 	return lastPlayerAction;
@@ -65,10 +66,26 @@ void TreeNode::setLastPlayerAction(const CoordinateType &lastPlayerAction) {
 TreeNode::TreeNode(BoardType gridInfo):board(gridInfo) {
 }
 
-double TreeNode::getQ() const {
+const double& TreeNode::getQ() const {
 	return _Q;
 }
 
 void TreeNode::setQ(double q) {
 	_Q = q;
+}
+
+const std::vector<TreeNode *> &TreeNode::getChildren() const {
+	return children;
+}
+
+void TreeNode::setChildren(const std::vector<TreeNode *> &children) {
+	TreeNode::children = children;
+}
+
+double TreeNode::getWeights() const {
+	return weights;
+}
+
+void TreeNode::setWeights(double weights) {
+	TreeNode::weights = weights;
 }
