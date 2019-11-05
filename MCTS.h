@@ -17,7 +17,7 @@ const double Inf = 10e8f;
 class MCTS {
 public:
 	MCTS() = default;
-	MCTS(BoardType gridInfo, COLOR color, int blackPieceCounts, int whitePieceCounts);
+	MCTS(Game startSit);
 	~MCTS();
 	TreeNode* TreePolicy();
 	void Expandition(TreeNode *leaf);
@@ -26,10 +26,11 @@ public:
 	void exec();
 	double CalcUCB1(TreeNode *node, long long n);
 	TreeNode *chooseBestChild(TreeNode *father);
+	
+	
 private:
 	COLOR sideColor;
-	BoardType position;
-	TreeNode *rootPos = nullptr;
+	TreeNode *root = nullptr;
 };
 
 

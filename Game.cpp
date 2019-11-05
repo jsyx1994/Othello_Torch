@@ -10,17 +10,17 @@
 
 static int dx[] = {-1, 0, 1, 1, 1, 0, -1, -1};
 static int dy[] = {-1, -1, -1, 0, 1, 1, 1, 0};
-
-Game::Game() :
-		effectivePoints(std::max(BoardSizeX, BoardSizeY), std::vector<int>(2)){}
-
+static std::vector<std::vector<int>> effectivePoints(std::max(BoardSizeX, BoardSizeY), std::vector<int> (2));
 /**
  * BotZone style of init
  * example input 1:   {"requests":[{"x":-1,"y":-1}],"responses":[]}
  * example input 2:   {"requests":[{"x":-1,"y":-1},{"x":2,"y":2},{"x":1,"y":3},{"x":3,"y":1},{"x":0,"y":2}],"responses":[{"x":2,"y":3},{"x":2,"y":1},{"x":1,"y":2},{"x":1,"y":4}]}
  **/
+Game::Game():gridInfo(BoardSizeY,std::vector<COLOR> (BoardSizeX, COLOR::Null)) {
+}
 
-void Game::LoadFromJson(BoardType &gridInfo, int &whitePieceCounts, int &blackPieceCounts) {
+
+void Game::LoadFromJson() {
 	int x, y;
 	whitePieceCounts = 2;
 	blackPieceCounts = 2;
@@ -37,26 +37,26 @@ void Game::LoadFromJson(BoardType &gridInfo, int &whitePieceCounts, int &blackPi
 	
 	// 分析自己收到的输入和自己过往的输出，并恢复状态
 	int turnID = input["responses"].size();
-	currBotColor = input["requests"][(Json::Value::UInt) 0]["x"].asInt() < 0 ? COLOR::Black : COLOR::White;//-1,-1 black
-	COLOR opponentColor = Opponent(currBotColor);
+	sideColor = input["requests"][(Json::Value::UInt) 0]["x"].asInt() < 0 ? COLOR::Black : COLOR::White;//-1,-1 black
+	COLOR opponentColor = Opponent(sideColor);
 	
 	for (int i = 0; i < turnID; i++) {
 		// 根据这些输入输出逐渐恢复状态到当前回合
 		x = input["requests"][i]["x"].asInt();
 		y = input["requests"][i]["y"].asInt();
 		if (x >= 0)
-			ProcStep(gridInfo, blackPieceCounts, whitePieceCounts, x, y, opponentColor); // 模拟对方落子
+			ProcStep(x, y, opponentColor); // 模拟对方落子
 		x = input["responses"][i]["x"].asInt();
 		y = input["responses"][i]["y"].asInt();
 		if (x >= 0)
-			ProcStep(gridInfo,blackPieceCounts, whitePieceCounts, x, y, currBotColor); // 模拟己方落子
+			ProcStep(x, y, sideColor); // 模拟己方落子
 	}
 	
 	// 看看自己本回合输入
 	x = input["requests"][turnID]["x"].asInt();
 	y = input["requests"][turnID]["y"].asInt();
 	if (x >= 0)
-		ProcStep(gridInfo,blackPieceCounts, whitePieceCounts, x, y, opponentColor); // 模拟对方落子
+		ProcStep(x, y, opponentColor); // 模拟对方落子
 }
 
 bool Game::MoveStep(int &x, int &y, int Direction) {
@@ -66,7 +66,8 @@ bool Game::MoveStep(int &x, int &y, int Direction) {
 	return true;
 }
 
-bool Game::ProcStep(BoardType &gridInfo, int &blackPieceCounts, int &whitePieceCounts, int xPos, int yPos, COLOR color, bool checkOnly) {
+bool Game::ProcStep(int xPos, int yPos, COLOR color, bool checkOnly) {
+	
 	int dir, x, y, currCount;
 	bool isValidMove = false;
 	if (gridInfo[xPos][yPos] != COLOR::Null)
@@ -122,11 +123,11 @@ bool Game::ProcStep(BoardType &gridInfo, int &blackPieceCounts, int &whitePieceC
 		return false;
 }
 
-bool Game::CheckIfHasValidMove(BoardType &gridInfo,int &blackPieceCounts, int &whitePieceCounts, const COLOR &color) {
+bool Game::CheckIfHasValidMove(const COLOR &color) {
 	int x, y;
 	for (y = 0; y < 8; y++)
 		for (x = 0; x < 8; x++)
-			if (ProcStep(gridInfo,blackPieceCounts, whitePieceCounts, x, y, color, true))
+			if (ProcStep(x, y, color, true))
 				return true;
 	return false;
 }
@@ -144,7 +145,7 @@ COLOR Game::Opponent(const COLOR &myColor) {
 	return myColor == COLOR::Black ? COLOR::White : COLOR::Black;
 }
 
-void Game::PrintBoard(const BoardType &gridInfo) const{
+void Game::PrintBoard() const{
 	std::cout << "Y X";
 	for (int i = 0; i < 8; ++i) {
 		std::cout << i << "  ";
@@ -165,21 +166,16 @@ void Game::PrintBoard(const BoardType &gridInfo) const{
 	std::cout << std::endl;
 }
 
-std::pair<int, int> Game::RandomPolicy(BoardType &gridInfo, int &blackPieceCounts, int &whitePieceCounts) {
-	int possiblePos[64][2], posCount = 0, choice;
-	int x, y;
-	for (y = 0; y < 8; y++)
-		for (x = 0; x < 8; x++)
-			if (ProcStep(gridInfo,blackPieceCounts,whitePieceCounts, x, y, currBotColor, true)) {
-				possiblePos[posCount][0] = x;
-				possiblePos[posCount++][1] = y;
-			}
+std::pair<int, int> Game::RandomPolicy() {
+	auto actions = getValidSteps();
+	std::random_device rd;
+	std::mt19937 mt(rd());
+	std::uniform_int_distribution<int> dist(0, actions.size()-1);
 	int resultX, resultY;
-	if (posCount > 0) {
-		srand(time(0));
-		choice = rand() % posCount;
-		resultX = possiblePos[choice][0];
-		resultY = possiblePos[choice][1];
+	if (!actions.empty()) {
+		int choice = dist(mt);
+		resultX = actions[choice].first;
+		resultY = actions[choice].second;
 	} else {
 		resultX = -1;
 		resultY = -1;
@@ -196,22 +192,39 @@ void Game::OutputToJson(int resultX, int resultY) {
 	std::cout << writer.write(ret) << std::endl;
 }
 
-COLOR Game::getCurrBotColor() const {
-	return currBotColor;
+COLOR Game::getSideColor() const {
+	return sideColor;
 }
 
-bool Game::isGameEnded(BoardType &gridInfo, int whitePieces, int blackPieces) {
-	return (whitePieces + blackPieces >= BoardSizeX * BoardSizeY) ||
-	       ((!CheckIfHasValidMove(gridInfo,blackPieces, whitePieces, COLOR::White)) && (!CheckIfHasValidMove(gridInfo,blackPieces, whitePieces, COLOR::Black)));
+bool Game::isGameEnded() {
+	return (whitePieceCounts + blackPieceCounts >= BoardSizeX * BoardSizeY) ||
+	       ((!CheckIfHasValidMove(COLOR::White)) && (!CheckIfHasValidMove(COLOR::Black)));
 }
 
-COLOR Game::judgeWinner(const int whitePieces, const int blackPieces) const {
-	return whitePieces == blackPieces ? COLOR::Null : whitePieces > blackPieces ? COLOR::White : COLOR::Black;
+COLOR Game::judgeWinner() const {
+	return whitePieceCounts == blackPieceCounts ? COLOR::Null : whitePieceCounts > blackPieceCounts ? COLOR::White : COLOR::Black;
 }
 
-void Game::setCurrBotColor(COLOR currBotColor) {
-	Game::currBotColor = currBotColor;
+void Game::setSideColor(COLOR color) {
+	Game::sideColor = color;
 }
+
+void Game::exchange() {
+	setSideColor(sideColor == COLOR::Black ? COLOR::White : COLOR::Black);
+}
+
+std::vector<std::pair<int, int>> Game::getValidSteps() {
+	std::vector<std::pair<int ,int>> validSteps;
+	for (int x = 0; x < BoardSizeX; ++x) {
+		for (int y = 0; y < BoardSizeY; ++y) {
+			if (ProcStep(x, y, sideColor, true))
+				validSteps.push_back(std::make_pair(x, y));
+		}
+	}
+	return validSteps;
+}
+
+
 
 
 

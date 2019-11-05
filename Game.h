@@ -7,29 +7,36 @@
 
 #include <string>
 #include <vector>
-#include "settings.h"
+#include <random>
 
+#include "settings.h"
 class Game {
 public:
 	Game();
-	void LoadFromJson(BoardType &gridInfo, int &whitePieceCounts, int &blackPieceCounts);
-	bool MoveStep(int &x, int &y, int Direction);
-	bool ProcStep(BoardType &gridInfo,int &blackPieceCounts, int &whitePieceCounts, int xPos, int yPos, COLOR color, bool checkOnly = false);
-	bool CheckIfHasValidMove(BoardType &gridInfo,int &blackPieceCounts, int &whitePieceCounts, const COLOR &color);
+	static bool MoveStep(int &x, int &y, int Direction);
+	bool CheckIfHasValidMove(const COLOR &color);
 	
-	bool ChangeColor(COLOR &color);
+	void LoadFromJson();
+	bool ProcStep(int xPos, int yPos, COLOR color, bool checkOnly = false);
+	
+	
+	bool ChangeColor(COLOR &color);// change the color of the stone
+	
+	void exchange();//change the side color
+	
 	COLOR Opponent(const COLOR &myColor);
-	void PrintBoard(const BoardType &gridInfo) const;
+	
+	void PrintBoard() const;
 	void OutputToJson(int x, int y);
 	
-	bool isGameEnded(BoardType &gridInfo, int whitePieces, int blackPieces);
-	COLOR judgeWinner(const int whitePieces, const int blackPieces) const;
+	bool isGameEnded();
+	COLOR judgeWinner() const;
 	
-	COLOR getCurrBotColor() const;
+	COLOR getSideColor() const;
 	
 	BoardType &getGridInfo();
 	
-	std::pair<int ,int> RandomPolicy(BoardType &girdInfo, int &blackPieceCounts, int &whitePieceCounts);
+	std::pair<int ,int> RandomPolicy();
 	
 	int getBlackPieceCounts() const;
 	
@@ -39,15 +46,17 @@ public:
 	
 	void setWhitePieceCounts(int whitePieceCounts);
 	
-	void setCurrBotColor(COLOR currBotColor);
-
-private:
-	std::vector<std::vector<int>> effectivePoints;
-	COLOR currBotColor;
-//	BoardType gridInfo;
-//	int blackPieceCounts;
-//	int whitePieceCounts;
+	void setSideColor(COLOR color);
 	
+	std::vector<std::pair<int ,int>> getValidSteps();
+	
+	void smartRandom();
+	
+private:
+	COLOR sideColor;
+	BoardType gridInfo;
+	int blackPieceCounts = 2;
+	int whitePieceCounts = 2;
 };
 
 

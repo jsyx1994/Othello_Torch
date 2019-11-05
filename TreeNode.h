@@ -6,28 +6,19 @@
 #define OTHELLO_TORCH_TREENODE_H
 
 #include <vector>
+#include <map>
 #include <algorithm>
 
 #include "settings.h"
-
+#include "Game.h"
+class TreeNode;
+using Children = std::vector<TreeNode *>;
 
 class TreeNode {
 public:
 	
-	TreeNode();
-	TreeNode(BoardType gridInfo);
-	
-	COLOR getSideColor() const;
-	
-	void setSideColor(COLOR sideColor);
-	
-	int getBlackPieceCounts() const;
-	
-	void setBlackPieceCounts(int blackPieceCounts);
-	
-	int getWhitePieceCounts() const;
-	
-	void setWhitePieceCounts(int whitePieceCounts);
+	TreeNode() = default;
+	TreeNode(const Game &situation, int xPos = -1, int yPos = -1);
 	
 	const CoordinateType &getLastPlayerAction() const;
 	
@@ -49,25 +40,22 @@ public:
 		return !children.empty();
 	}
 	
-	const std::vector<TreeNode *> &getChildren() const;
-	
-	void setChildren(const std::vector<TreeNode *> &children);
+	const Children &getChildren() const;
 	
 	double getWeights() const;
 	
 	void setWeights(double weights);
+	
+	Game & getSituation();
+	
+	void addChild(TreeNode *child);
 
 private:
-	COLOR sideColor;
-	BoardType board;
+	Game situation;
 	CoordinateType lastPlayerAction;
-	std::vector<TreeNode *> children;
-	int blackPieceCounts;
-	int whitePieceCounts;
-	
+	Children children;
 	long long visits;
 	double _Q;
-	
 	double weights;
 };
 

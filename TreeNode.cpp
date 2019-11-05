@@ -4,29 +4,8 @@
 
 #include "TreeNode.h"
 
-COLOR TreeNode::getSideColor() const {
-	return sideColor;
-}
-
-void TreeNode::setSideColor(COLOR sideColor) {
-	TreeNode::sideColor = sideColor;
-}
-
-int TreeNode::getBlackPieceCounts() const {
-	return blackPieceCounts;
-}
-
-void TreeNode::setBlackPieceCounts(int blackPieceCounts) {
-	TreeNode::blackPieceCounts = blackPieceCounts;
-}
-
-int TreeNode::getWhitePieceCounts() const {
-	return whitePieceCounts;
-}
-
-void TreeNode::setWhitePieceCounts(int whitePieceCounts) {
-	TreeNode::whitePieceCounts = whitePieceCounts;
-}
+TreeNode::TreeNode(const Game &situation, int xPos, int yPos) : situation(
+		situation), lastPlayerAction(std::make_pair(xPos, yPos)), children({}), visits(0), _Q(.0f), weights(0.0f) {}
 
 long long int TreeNode::getVisits() const {
 	return visits;
@@ -36,24 +15,6 @@ void TreeNode::setVisits(long long int visits) {
 	TreeNode::visits = visits;
 }
 
-const BoardType &TreeNode::getBoard() const {
-	return board;
-}
-
-void TreeNode::setBoard(const BoardType &board) {
-	TreeNode::board = board;
-}
-
-TreeNode::TreeNode():
-		sideColor(COLOR::Null),
-		board(BoardSizeY, std::vector<COLOR> (BoardSizeX, COLOR::Null)),
-		children({}),
-		blackPieceCounts(0),
-		whitePieceCounts(0),
-		visits(0),
-		_Q(.0f),
-		weights(.0f)
-		{}
 
 const CoordinateType &TreeNode::getLastPlayerAction() const {
 	return lastPlayerAction;
@@ -63,8 +24,6 @@ void TreeNode::setLastPlayerAction(const CoordinateType &lastPlayerAction) {
 	TreeNode::lastPlayerAction = lastPlayerAction;
 }
 
-TreeNode::TreeNode(BoardType gridInfo):board(gridInfo) {
-}
 
 const double& TreeNode::getQ() const {
 	return _Q;
@@ -74,13 +33,10 @@ void TreeNode::setQ(double q) {
 	_Q = q;
 }
 
-const std::vector<TreeNode *> &TreeNode::getChildren() const {
+const Children &TreeNode::getChildren() const {
 	return children;
 }
 
-void TreeNode::setChildren(const std::vector<TreeNode *> &children) {
-	TreeNode::children = children;
-}
 
 double TreeNode::getWeights() const {
 	return weights;
@@ -89,3 +45,13 @@ double TreeNode::getWeights() const {
 void TreeNode::setWeights(double weights) {
 	TreeNode::weights = weights;
 }
+
+Game & TreeNode::getSituation() {
+	return situation;
+}
+
+void TreeNode::addChild(TreeNode *child) {
+	this->children.push_back(child);
+}
+
+

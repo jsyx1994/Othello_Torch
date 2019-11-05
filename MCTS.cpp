@@ -5,19 +5,15 @@
 #include "MCTS.h"
 #include <cmath>
 #include <algorithm>
+#include <iostream>
+#include <tcl.h>
 
-MCTS::MCTS(BoardType gridInfo, COLOR color, int blackPieceCounts, int whitePieceCounts) : position(gridInfo),
-                                                                                          sideColor(color) {
-	srand(time(NULL));
-	
-	rootPos = new TreeNode(gridInfo);
-	rootPos->setSideColor(color);
-	rootPos->setBlackPieceCounts(blackPieceCounts);
-	rootPos->setWhitePieceCounts(whitePieceCounts);
-	rootPos->setLastPlayerAction(std::make_pair(-1, -1));
-	
-	
+using Position = Game;
+
+MCTS::MCTS(Game startSit) {
+	root = new TreeNode(startSit);
 	auto leaf = TreePolicy();
+	Expandition(leaf);
 }
 
 double MCTS::CalcUCB1(TreeNode *node, long long n) {
@@ -31,13 +27,21 @@ double MCTS::CalcUCB1(TreeNode *node, long long n) {
 }
 
 TreeNode *MCTS::chooseBestChild(TreeNode *father) {
-	auto children = father->getChildren();
-	return *std::max_element(children.begin(), children.end(),
-	                         [](TreeNode *x, TreeNode *y) { return x->getWeights() < y->getWeights(); });
+	Children children = father->getChildren();
+	std::cout << typeid(children.begin()).name();
+	return *std::max_element(children.begin(),children.end(),[](TreeNode *a, TreeNode *b){
+		return a->getWeights() < b->getWeights();
+	});
+//	return nullptr;
+//	return  std::max_element(children.begin()->second, children.end()->second,
+//	                           [](TreeNode &x, TreeNode &y) {
+//		                           return x.getWeights() < y.getWeights();
+//	                           });
+	
 }
 
 TreeNode *MCTS::TreePolicy() {
-	TreeNode *pawn = rootPos;
+	TreeNode *pawn = root;
 	long long fatherVisits = pawn->getVisits();
 	while (pawn->HasChild()) {
 		pawn = chooseBestChild(pawn);
@@ -46,9 +50,17 @@ TreeNode *MCTS::TreePolicy() {
 }
 
 void MCTS::Expandition(TreeNode *leaf) {
-
+	Position pos = leaf->getSituation();
+	auto actions = pos.getValidSteps();
+	for (auto action : actions) {
+		int xPos = action.first, yPos = action.second;
+		std::cout << action.first << ' ' << action.second;
+		Position newPos(pos);
+		newPos.ProcStep(action.first, action.second, pos.getSideColor());
+		newPos.exchange();  //enemies' turn
+		TreeNode *childNode = new TreeNode(newPos, xPos, yPos);
+		leaf->addChild(childNode);
+	}
+	
+	
 }
-
-
-
-
